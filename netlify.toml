@@ -1,0 +1,112 @@
+[build]
+  # Build command
+  command = "npm run build"
+  
+  # Directory to publish
+  publish = "build"
+  
+  # Node.js version
+  [build.environment]
+    NODE_VERSION = "18"
+    NPM_VERSION = "9"
+
+# Redirect rules for SPA (Single Page Application)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Headers for security and performance
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+
+# Cache static assets (JS, CSS, images)
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Cache HTML files for shorter time
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+# Cache service worker
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+# Cache manifest
+[[headers]]
+  for = "/manifest.json"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+
+# Cache robots.txt and sitemap
+[[headers]]
+  for = "/robots.txt"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+
+[[headers]]
+  for = "/sitemap.xml"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+
+# Environment variables for different contexts
+[context.production.environment]
+  NODE_ENV = "production"
+  REACT_APP_API_URL = "https://your-backend-server.com/api"
+  REACT_APP_DOMAIN = "karshakfoodlife"
+  REACT_APP_SITE_NAME = "KFL - Karshak Food Life"
+  REACT_APP_SITE_URL = "https://karshakfoodlife.in"
+
+[context.deploy-preview.environment]
+  NODE_ENV = "development"
+  REACT_APP_API_URL = "https://your-backend-server.com/api"
+  REACT_APP_DOMAIN = "karshakfoodlife"
+  REACT_APP_SITE_NAME = "KFL - Karshak Food Life (Preview)"
+  REACT_APP_SITE_URL = "https://deploy-preview-123--your-site.netlify.app"
+
+[context.branch-deploy.environment]
+  NODE_ENV = "development"
+  REACT_APP_API_URL = "https://your-backend-server.com/api"
+  REACT_APP_DOMAIN = "karshakfoodlife"
+  REACT_APP_SITE_NAME = "KFL - Karshak Food Life (Branch)"
+  REACT_APP_SITE_URL = "https://branch-name--your-site.netlify.app"
+
+# Build plugins
+[[plugins]]
+  package = "@netlify/plugin-lighthouse"
+  
+  [plugins.inputs.thresholds]
+    performance = 0.9
+    accessibility = 0.9
+    best-practices = 0.9
+    seo = 0.9
+
+# Form processing
+[build.processing]
+  skip_processing = false
+
+[build.processing.css]
+  bundle = true
+  minify = true
+
+[build.processing.js]
+  bundle = true
+  minify = true
+
+[build.processing.html]
+  pretty_urls = true
+
+[build.processing.images]
+  compress = true
