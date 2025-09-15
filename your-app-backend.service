@@ -1,0 +1,18 @@
+[Unit]
+Description=Your App Django Backend
+After=network.target postgresql.service
+
+[Service]
+Type=exec
+User=your-app
+Group=your-app
+WorkingDirectory=/opt/your-app/backend/server
+Environment=DJANGO_SETTINGS_MODULE=server.settings_prod
+ExecStart=/opt/your-app/backend-env/bin/python manage.py runserver 0.0.0.0:8000
+Restart=always
+RestartSec=3
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

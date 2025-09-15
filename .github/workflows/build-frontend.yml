@@ -1,0 +1,40 @@
+name: Build and Deploy Frontend
+
+on:
+  push:
+    branches: [ main ]
+    paths: [ 'src/**', 'public/**', 'package.json', 'vite.config.ts' ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm install
+    
+    - name: Build for production
+      run: npm run build
+      env:
+        VITE_API_URL: ${{ secrets.API_URL }}
+    
+    - name: Deploy to server
+      uses: appleboy/ssh-action@v0.1.5
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSH_KEY }}
+        script: |
+          cd /opt/kfl-app/frontend
+          git pull origin main
+          npm install
+          npm run build
+          sudo systemctl reload nginx
