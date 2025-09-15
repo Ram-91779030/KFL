@@ -1,0 +1,7 @@
+# Netlify Redirects for KFL E-commerce Website
+
+# API redirects to backend server (if needed)
+# /api/* https://your-backend-server.com/api/:splat 200
+
+# SPA fallback - must be last
+/* /index.html 200
