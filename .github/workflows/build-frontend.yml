@@ -22,18 +22,23 @@ jobs:
     - name: Build for production
       run: npm run build
       env:
-        VITE_API_URL: ${{ secrets.API_URL }}
+        VITE_API_URL: ""  # Use mock API
     
-    - name: Deploy to server
+    - name: Test build
+      run: |
+        if [ ! -d "build" ]; then
+          echo "Build failed - no build directory found"
+          exit 1
+        fi
+        echo "Build successful - $(du -sh build | cut -f1) size"
+    
+    - name: Deploy to server (DISABLED)
+      if: false  # This step is disabled
       uses: appleboy/ssh-action@v0.1.5
       with:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.SSH_KEY }}
         script: |
-          cd /opt/kfl-app/frontend
-          git pull origin main
-          npm install
-          npm run build
-          sudo systemctl reload nginx
-  workflow_dispatch: # Manual trigger only
+          echo "SSH deployment is disabled"
+          echo "Use Vercel or Netlify deployment instead"

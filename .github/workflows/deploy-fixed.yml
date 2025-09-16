@@ -1,7 +1,7 @@
 name: Deploy KFL to Server (DISABLED)
 
 on:
-  workflow_dispatch: # Manual trigger only - SSH deployment disabled
+ - SSH deployment disabled
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -145,4 +145,3 @@ jobs:
         echo "- Server not accessible"
         echo "- Deployment script not found or not executable"
         echo "- Missing dependencies on server"
-  workflow_dispatch: # Manual trigger only

@@ -1,7 +1,7 @@
 name: Deploy to Production (DISABLED)
 
 on:
-  workflow_dispatch: # Manual trigger only - SSH deployment disabled
+ - SSH deployment disabled
 
 jobs:
   test:
@@ -69,4 +69,3 @@ jobs:
         script: |
           cd /opt/kfl-app
           sudo -u kfl-app ./deploy.sh
-  workflow_dispatch: # Manual trigger only

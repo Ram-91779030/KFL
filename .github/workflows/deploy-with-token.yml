@@ -1,7 +1,7 @@
 name: Deploy KFL to ogbar.in (DISABLED)
 
 on:
-  workflow_dispatch: # Manual trigger only - SSH deployment disabled
+ - SSH deployment disabled
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -89,4 +89,3 @@ jobs:
         echo "🌐 Website: https://ogbar.in"
         echo "🔧 API: https://ogbar.in/api"
         echo "⚙️ Admin: https://ogbar.in/admin"
-  workflow_dispatch: # Manual trigger only
