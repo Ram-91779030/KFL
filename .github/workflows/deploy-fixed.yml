@@ -1,0 +1,149 @@
+name: Deploy KFL to Server (Fixed)
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch: # Allow manual triggering
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - name: Checkout KFL repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install frontend dependencies
+      run: npm install
+    
+    - name: Build frontend
+      run: npm run build
+      env:
+        VITE_API_URL: https://ogbar.in/api
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: Install backend dependencies
+      run: |
+        cd server
+        pip install -r requirements.txt
+    
+    - name: Run backend tests
+      run: |
+        cd server
+        export DJANGO_SETTINGS_MODULE=server.settings
+        python manage.py test
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout KFL repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Test SSH connection
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSH_KEY }}
+        script: |
+          echo "SSH connection successful!"
+          whoami
+          pwd
+          ls -la /opt/kfl-app || echo "Directory not found"
+    
+    - name: Deploy to ogbar.in server
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSH_KEY }}
+        script: |
+          echo "🚀 Starting deployment..."
+          
+          # Check if deployment script exists and is executable
+          if [ -f "/opt/kfl-app/deploy-from-github.sh" ]; then
+            chmod +x /opt/kfl-app/deploy-from-github.sh
+            echo "✅ Deployment script found and made executable"
+          else
+            echo "❌ Deployment script not found at /opt/kfl-app/deploy-from-github.sh"
+            echo "Available files in /opt/kfl-app:"
+            ls -la /opt/kfl-app/ || echo "Directory does not exist"
+            exit 1
+          fi
+          
+          # Run deployment
+          cd /opt/kfl-app
+          sudo -u kfl-app ./deploy-from-github.sh
+        envs: GITHUB_TOKEN
+    
+    - name: Verify deployment
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSH_KEY }}
+        script: |
+          echo "🔍 Verifying deployment..."
+          
+          # Check if services are running
+          sudo systemctl status kfl-backend --no-pager || echo "Backend service not found"
+          sudo systemctl status nginx --no-pager || echo "Nginx service not found"
+          
+          # Test API endpoint
+          curl -f -s http://localhost:8000/api/ && echo "✅ API is responding" || echo "❌ API not responding"
+          
+          # Test frontend
+          curl -f -s http://localhost/ && echo "✅ Frontend is accessible" || echo "❌ Frontend not accessible"
+    
+    - name: Notify deployment success
+      if: success()
+      run: |
+        echo "✅ KFL project successfully deployed to ogbar.in"
+        echo "🌐 Website: https://ogbar.in"
+        echo "🔧 API: https://ogbar.in/api"
+        echo "⚙️ Admin: https://ogbar.in/admin"
+    
+    - name: Notify deployment failure
+      if: failure()
+      run: |
+        echo "❌ KFL project deployment failed"
+        echo "Check the logs above for details"
+        echo "Common issues:"
+        echo "- SSH key not configured properly"
+        echo "- Server not accessible"
+        echo "- Deployment script not found or not executable"
+        echo "- Missing dependencies on server"
