@@ -28,30 +28,56 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Skip non-GET requests
+  if (event.request.method !== 'GET') {
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
-        // Return cached version or fetch from network
+        // Return cached version if available
         if (response) {
           return response;
         }
         
-        return fetch(event.request).then((response) => {
-          // Don't cache non-successful responses
-          if (!response || response.status !== 200 || response.type !== 'basic') {
+        // Fetch from network with error handling
+        return fetch(event.request)
+          .then((response) => {
+            // Don't cache non-successful responses
+            if (!response || response.status !== 200 || response.type !== 'basic') {
+              return response;
+            }
+
+            // Clone the response for caching
+            const responseToCache = response.clone();
+
+            caches.open(CACHE_NAME)
+              .then((cache) => {
+                cache.put(event.request, responseToCache);
+              })
+              .catch((error) => {
+                console.log('Cache put failed:', error);
+              });
+
             return response;
-          }
-
-          // Clone the response
-          const responseToCache = response.clone();
-
-          caches.open(CACHE_NAME)
-            .then((cache) => {
-              cache.put(event.request, responseToCache);
-            });
-
-          return response;
-        });
+          })
+          .catch((error) => {
+            console.log('Fetch failed:', error);
+            // Return a fallback response for failed requests
+            if (event.request.destination === 'document') {
+              return caches.match('/index.html');
+            }
+            throw error;
+          });
+      })
+      .catch((error) => {
+        console.log('Cache match failed:', error);
+        // Return a fallback for critical resources
+        if (event.request.destination === 'document') {
+          return new Response('Page not found', { status: 404 });
+        }
+        throw error;
       })
   );
 });
