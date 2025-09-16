@@ -1,97 +1,59 @@
 #!/bin/bash
 
-# 🚀 Quick Deploy Script - Get ogbar.in Live NOW!
-# This script helps you deploy your KFL website immediately
-
-set -e
-
-echo "🚀 QUICK DEPLOYMENT - Getting ogbar.in Live!"
-
-# Colors for output
-GREEN='\033[0;32m'
-BLUE='\033[0;34m'
-YELLOW='\033[1;33m'
-RED='\033[0;31m'
-NC='\033[0m'
-
-print_status() {
-    echo -e "${BLUE}[INFO]${NC} $1"
-}
-
-print_success() {
-    echo -e "${GREEN}[SUCCESS]${NC} $1"
-}
-
-print_warning() {
-    echo -e "${YELLOW}[WARNING]${NC} $1"
-}
-
-print_error() {
-    echo -e "${RED}[ERROR]${NC} $1"
-}
-
-# Check if we're in the right directory
-if [ ! -f "package.json" ]; then
-    print_error "package.json not found. Please run this script from the project root directory."
-    exit 1
-fi
-
-print_status "Building project for production..."
-npm run build
-
-if [ ! -d "build" ]; then
-    print_error "Build failed. No build directory found."
-    exit 1
-fi
-
-print_success "Build completed successfully"
-
-# Check build size
-BUILD_SIZE=$(du -sh build | cut -f1)
-print_status "Build size: $BUILD_SIZE"
-
-# Commit and push changes
-print_status "Pushing latest changes to GitHub..."
-git add .
-git commit -m "Quick deploy: Ready for live deployment" || echo "No changes to commit"
-git push origin main
-
-print_success "✅ Code pushed to GitHub successfully!"
-
-echo ""
-print_warning "🚨 ogbar.in is not opening because it's not deployed yet!"
-echo ""
-print_status "🎯 IMMEDIATE SOLUTIONS (Choose One):"
-echo ""
-echo "1. 🌐 NETLIFY (RECOMMENDED - 5 minutes):"
-echo "   - Go to: https://netlify.com"
-echo "   - Sign up with GitHub"
-echo "   - Click 'New site from Git'"
-echo "   - Select: Ram-91779030/KFL"
-echo "   - Build command: npm run build"
-echo "   - Publish directory: build"
-echo "   - Deploy!"
-echo ""
-echo "2. ⚡ VERCEL (5 minutes):"
-echo "   - Go to: https://vercel.com"
-echo "   - Import GitHub repository"
-echo "   - Deploy!"
-echo ""
-echo "3. 📱 GITHUB PAGES (FREE):"
-echo "   - Go to: https://github.com/Ram-91779030/KFL/settings/pages"
-echo "   - Deploy from main branch"
-echo "   - Your site: https://ram-91779030.github.io/KFL"
-echo ""
-echo "4. 🧪 TEST LOCALLY:"
-echo "   npx serve -s build -l 3000"
-echo "   Visit: http://localhost:3000"
+echo "🚀 KFL Quick Deploy"
+echo "==================="
 echo ""
 
-print_status "📋 After deployment:"
-echo "- You'll get a live URL (e.g., https://random-name.netlify.app)"
-echo "- Add ogbar.in as custom domain in hosting settings"
-echo "- Update DNS records to point to your hosting provider"
+echo "📱 Opening deployment platforms..."
 echo ""
 
-print_success "✅ Your website is ready for deployment!"
-print_warning "⚠️  ogbar.in will work once you deploy to a hosting service!"
+# Open deployment platforms
+echo "🔵 Opening Vercel..."
+open "https://vercel.com/new"
+
+echo "🟢 Opening Netlify..."
+open "https://app.netlify.com/start"
+
+echo "🟡 Opening Railway..."
+open "https://railway.app/new"
+
+echo ""
+echo "📋 DEPLOYMENT STEPS:"
+echo "==================="
+echo ""
+echo "🔵 VERCEL (Frontend):"
+echo "1. Click 'Import Git Repository'"
+echo "2. Select 'Ram-91779030/KFL'"
+echo "3. Framework: Vite"
+echo "4. Build Command: npm run build"
+echo "5. Output Directory: build"
+echo "6. Click 'Deploy'"
+echo ""
+
+echo "🟢 NETLIFY (Frontend):"
+echo "1. Click 'New site from Git'"
+echo "2. Choose GitHub → 'Ram-91779030/KFL'"
+echo "3. Build command: npm run build"
+echo "4. Publish directory: build"
+echo "5. Click 'Deploy site'"
+echo ""
+
+echo "🟡 RAILWAY (Backend):"
+echo "1. Click 'Deploy from GitHub repo'"
+echo "2. Select 'Ram-91779030/KFL'"
+echo "3. Root Directory: server"
+echo "4. Build Command: pip install -r requirements.txt"
+echo "5. Start Command: python manage.py migrate && python manage.py collectstatic --noinput && gunicorn server.wsgi:application --bind 0.0.0.0:\$PORT"
+echo "6. Click 'Deploy'"
+echo ""
+
+echo "⏱️  Deployment time: ~5 minutes"
+echo "🎉 Your sites will be live at:"
+echo "   Frontend: https://kfl-karshakfoodlife.vercel.app"
+echo "   Backend: https://kfl-backend.railway.app"
+echo "   Admin: https://kfl-backend.railway.app/admin"
+echo ""
+
+echo "✅ After deployment, update frontend API URL:"
+echo "   Vercel: Settings → Environment Variables → VITE_API_URL = https://kfl-backend.railway.app"
+echo "   Netlify: Site settings → Environment variables → VITE_API_URL = https://kfl-backend.railway.app"
