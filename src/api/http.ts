@@ -2,13 +2,19 @@ import axios from 'axios';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:8000');
 
+// Check if we should use mock API
+const USE_MOCK_API = !API_BASE_URL || API_BASE_URL === '' || API_BASE_URL.includes('ogbar.in');
+
 // Create axios instance
 export const api = axios.create({
-  baseURL: `${API_BASE_URL}/api`,
+  baseURL: USE_MOCK_API ? '/mock-api' : `${API_BASE_URL}/api`,
   headers: {
     'Content-Type': 'application/json',
   },
 });
+
+// Export mock API flag for use in other files
+export { USE_MOCK_API };
 
 // Request interceptor to add auth token
 api.interceptors.request.use(

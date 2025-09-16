@@ -1,4 +1,5 @@
-import api from './http';
+import api, { USE_MOCK_API } from './http';
+import { mockApi } from './mockApi';
 import type {
   Category,
   Product,
@@ -35,10 +36,17 @@ export const authApi = {
 
 // Public endpoints
 export const publicApi = {
-  getCategories: (): Promise<Category[]> =>
-    api.get('/categories/').then(res => res.data),
+  getCategories: (): Promise<Category[]> => {
+    if (USE_MOCK_API) {
+      return mockApi.getCategories();
+    }
+    return api.get('/categories/').then(res => res.data);
+  },
   
   getProducts: (filters?: ProductFilters): Promise<ApiResponse<Product>> => {
+    if (USE_MOCK_API) {
+      return mockApi.getProducts();
+    }
     const params = new URLSearchParams();
     if (filters?.search) params.append('search', filters.search);
     if (filters?.category) params.append('category', filters.category);
@@ -49,11 +57,21 @@ export const publicApi = {
     return api.get(`/products/?${params.toString()}`).then(res => res.data);
   },
   
-  getProduct: (slug: string): Promise<Product> =>
-    api.get(`/products/${slug}/`).then(res => res.data),
+  getProduct: (slug: string): Promise<Product> => {
+    if (USE_MOCK_API) {
+      return mockApi.getProducts().then(data => 
+        data.results.find(p => p.slug === slug) || data.results[0]
+      );
+    }
+    return api.get(`/products/${slug}/`).then(res => res.data);
+  },
   
-  getBanners: (): Promise<Banner[]> =>
-    api.get('/banners/active/').then(res => res.data),
+  getBanners: (): Promise<Banner[]> => {
+    if (USE_MOCK_API) {
+      return mockApi.getBanners();
+    }
+    return api.get('/banners/active/').then(res => res.data);
+  },
 };
 
 // Cart endpoints

@@ -83,7 +83,7 @@ jobs:
     - name: Build for production
       run: npm run build
       env:
-        VITE_API_URL: https://ogbar.in/api
+        VITE_API_URL: ""
     
     - name: Deploy to Netlify
       uses: nwtgck/actions-netlify@v3.0
@@ -118,26 +118,27 @@ jobs:
         echo "- Build failed"
         echo "- Missing dependencies"
 
-  deploy-vercel:
-    needs: test
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    
-    steps:
-    - name: Checkout KFL repository
-      uses: actions/checkout@v4
-    
-    - name: Deploy to Vercel
-      uses: amondnet/vercel-action@v25
-      with:
-        vercel-token: ${{ secrets.VERCEL_TOKEN }}
-        vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-        vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-        working-directory: ./
-        vercel-args: '--prod'
-    
-    - name: Notify Vercel deployment success
-      if: success()
-      run: |
-        echo "✅ KFL project successfully deployed to Vercel"
-        echo "🌐 Website: https://kfl-karshakfoodlife.vercel.app"
+  # Vercel deployment disabled - use Netlify instead
+  # deploy-vercel:
+  #   needs: test
+  #   runs-on: ubuntu-latest
+  #   if: github.ref == 'refs/heads/main'
+  #   
+  #   steps:
+  #   - name: Checkout KFL repository
+  #     uses: actions/checkout@v4
+  #   
+  #   - name: Deploy to Vercel
+  #     uses: amondnet/vercel-action@v25
+  #     with:
+  #       vercel-token: ${{ secrets.VERCEL_TOKEN }}
+  #       vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+  #       vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+  #       working-directory: ./
+  #       vercel-args: '--prod'
+  #   
+  #   - name: Notify Vercel deployment success
+  #     if: success()
+  #     run: |
+  #       echo "✅ KFL project successfully deployed to Vercel"
+  #       echo "🌐 Website: https://kfl-karshakfoodlife.vercel.app"
