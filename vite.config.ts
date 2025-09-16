@@ -91,7 +91,13 @@
     build: {
       target: 'esnext',
       outDir: 'build',
+      rollupOptions: {
+        output: {
+          manualChunks: undefined,
+        },
+      },
     },
+    base: '/',
     server: {
       port: 5173,
       open: true,
