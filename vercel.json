@@ -7,12 +7,24 @@
       "config": {
         "distDir": "build"
       }
+    },
+    {
+      "src": "api/simple.py",
+      "use": "@vercel/python"
     }
   ],
   "routes": [
     {
+      "src": "/api/(.*)",
+      "dest": "/api/simple.py"
+    },
+    {
       "src": "/static/(.*)",
       "dest": "/static/$1"
+    },
+    {
+      "src": "/media/(.*)",
+      "dest": "/media/$1"
     },
     {
       "src": "/(.*)",
@@ -20,11 +32,12 @@
     }
   ],
   "functions": {
-    "app/api/**/*.js": {
-      "runtime": "nodejs18.x"
+    "api/simple.py": {
+      "runtime": "python3.9"
     }
   },
   "env": {
-    "NODE_ENV": "production"
+    "NODE_ENV": "production",
+    "PYTHONPATH": "/var/task"
   }
 }
