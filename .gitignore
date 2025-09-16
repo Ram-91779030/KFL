@@ -126,3 +126,6 @@ temp/
 .env.development
 .env.test
 .vercel
+
+# Local Netlify folder
+.netlify
