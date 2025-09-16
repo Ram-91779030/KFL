@@ -1,8 +1,9 @@
 name: Deploy KFL to Server (Fixed)
 
 on:
-  push:
-    branches: [ main ]
+  # Disabled SSH deployment - use Netlify instead
+  # push:
+  #   branches: [ main ]
   workflow_dispatch: # Allow manual triggering
 
 env:
