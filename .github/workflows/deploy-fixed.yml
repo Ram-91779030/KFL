@@ -1,6 +1,6 @@
 name: Deploy KFL to Server (Fixed)
 
-on:
+# DISABLED - on:
   # Disabled SSH deployment - use Netlify instead
   # push:
   #   branches: [ main ]
@@ -148,3 +148,4 @@ jobs:
         echo "- Server not accessible"
         echo "- Deployment script not found or not executable"
         echo "- Missing dependencies on server"
+  workflow_dispatch: # Manual trigger only

@@ -1,6 +1,6 @@
 name: Deploy KFL to ogbar.in
 
-on:
+# DISABLED - on:
   # Disabled SSH deployment - use Netlify instead
   # push:
   #   branches: [ main ]
@@ -94,3 +94,4 @@ jobs:
         echo "🌐 Website: https://ogbar.in"
         echo "🔧 API: https://ogbar.in/api"
         echo "⚙️ Admin: https://ogbar.in/admin"
+  workflow_dispatch: # Manual trigger only

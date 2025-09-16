@@ -1,9 +1,11 @@
 name: Build and Deploy Frontend
 
-on:
-  push:
-    branches: [ main ]
-    paths: [ 'src/**', 'public/**', 'package.json', 'vite.config.ts' ]
+# DISABLED - on:
+  # DISABLED - SSH deployment not configured
+  # push:
+  #   branches: [ main ]
+  #   paths: [ 'src/**', 'public/**', 'package.json', 'vite.config.ts' ]
+  workflow_dispatch: # Allow manual triggering only
 
 jobs:
   build-and-deploy:
@@ -38,3 +40,4 @@ jobs:
           npm install
           npm run build
           sudo systemctl reload nginx
+  workflow_dispatch: # Manual trigger only

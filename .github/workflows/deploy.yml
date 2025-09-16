@@ -1,6 +1,6 @@
 name: Deploy to Production
 
-on:
+# DISABLED - on:
   # Disabled SSH deployment - use Netlify instead
   # push:
   #   branches: [ main ]
@@ -74,3 +74,4 @@ jobs:
         script: |
           cd /opt/kfl-app
           sudo -u kfl-app ./deploy.sh
+  workflow_dispatch: # Manual trigger only
