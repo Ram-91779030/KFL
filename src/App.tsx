@@ -19,6 +19,7 @@ import { NotificationToast, useToast } from './components/NotificationToast';
 import { useCartStore } from './store/cart';
 import { useAuthStore } from './store/auth';
 import { HomePage } from './pages/HomePage';
+import SimpleHomePage from './pages/SimpleHomePage';
 import { ProductsPage } from './pages/ProductsPage';
 import { ProductDetailPage } from './pages/ProductDetailPage';
 import { CartPage } from './pages/CartPage';
@@ -213,8 +214,8 @@ export default function App() {
       
       <main>
         <PageTransition isLoading={pageLoading}>
-          <Routes>
-            <Route path="/" element={<HomePage />} />
+        <Routes>
+          <Route path="/" element={<SimpleHomePage />} />
             <Route path="/home" element={<HomePage />} />
             <Route path="/products" element={<ProductsPage />} />
             <Route path="/products/:slug" element={<ProductDetailPage />} />
