@@ -9,14 +9,14 @@
       }
     },
     {
-      "src": "api/simple.py",
+      "src": "api/main.py",
       "use": "@vercel/python"
     }
   ],
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "/api/simple.py"
+      "dest": "/api/main.py"
     },
     {
       "src": "/assets/(.*)",
@@ -48,5 +48,10 @@
   "env": {
     "NODE_ENV": "production",
     "PYTHONPATH": "/var/task"
+  },
+  "functions": {
+    "api/main.py": {
+      "runtime": "python3.9"
+    }
   }
 }
