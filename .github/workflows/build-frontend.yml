@@ -1,11 +1,7 @@
-name: Build and Deploy Frontend
+name: Build and Deploy Frontend (DISABLED)
 
-# DISABLED - on:
-  # DISABLED - SSH deployment not configured
-  # push:
-  #   branches: [ main ]
-  #   paths: [ 'src/**', 'public/**', 'package.json', 'vite.config.ts' ]
-  workflow_dispatch: # Allow manual triggering only
+on:
+  workflow_dispatch: # Manual trigger only - SSH deployment disabled
 
 jobs:
   build-and-deploy:
