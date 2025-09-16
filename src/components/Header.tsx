@@ -37,7 +37,7 @@ export function Header({ currentPage, onNavigate, cartCount = 0, isAuthenticated
   return (
     <div className={`sticky top-0 z-50 transition-all duration-300 ${
       isScrolled ? 'shadow-lg' : ''
-    }`} style={{ top: '3px' }}>
+    }`}>
       {/* Clean Top Ribbon */}
       <div className={`bg-red-500 text-white py-2 text-sm transition-all duration-300 ${
         isScrolled ? 'py-1' : 'py-2'
