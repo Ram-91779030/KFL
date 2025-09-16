@@ -9,30 +9,38 @@
       }
     },
     {
-      "src": "api/products.py",
+      "src": "api/products/index.py",
       "use": "@vercel/python"
     },
     {
-      "src": "api/categories.py",
+      "src": "api/categories/index.py",
       "use": "@vercel/python"
     },
     {
-      "src": "api/health.py",
+      "src": "api/health/index.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "api/admin/index.py",
       "use": "@vercel/python"
     }
   ],
   "routes": [
     {
       "src": "/api/products",
-      "dest": "/api/products.py"
+      "dest": "/api/products/index.py"
     },
     {
       "src": "/api/categories",
-      "dest": "/api/categories.py"
+      "dest": "/api/categories/index.py"
     },
     {
       "src": "/api/health",
-      "dest": "/api/health.py"
+      "dest": "/api/health/index.py"
+    },
+    {
+      "src": "/api/admin",
+      "dest": "/api/admin/index.py"
     },
     {
       "src": "/assets/(.*)",
