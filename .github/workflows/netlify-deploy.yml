@@ -1,0 +1,143 @@
+name: Deploy to Netlify
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch: # Allow manual triggering
+
+env:
+  NODE_VERSION: '18'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - name: Checkout KFL repository
+      uses: actions/checkout@v4
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+    
+    - name: Install frontend dependencies
+      run: npm install
+    
+    - name: Build frontend
+      run: npm run build
+      env:
+        VITE_API_URL: https://ogbar.in/api
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: Install backend dependencies
+      run: |
+        cd server
+        pip install -r requirements.txt
+    
+    - name: Run backend tests
+      run: |
+        cd server
+        export DJANGO_SETTINGS_MODULE=server.settings
+        python manage.py test
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
+
+  deploy-netlify:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout KFL repository
+      uses: actions/checkout@v4
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm install
+    
+    - name: Build for production
+      run: npm run build
+      env:
+        VITE_API_URL: https://ogbar.in/api
+    
+    - name: Deploy to Netlify
+      uses: nwtgck/actions-netlify@v3.0
+      with:
+        publish-dir: './build'
+        production-branch: main
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        deploy-message: "Deploy from GitHub Actions - ${{ github.sha }}"
+        enable-pull-request-comment: false
+        enable-commit-comment: true
+        overwrites-pull-request-comment: true
+      env:
+        NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+        NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+    
+    - name: Notify deployment success
+      if: success()
+      run: |
+        echo "✅ KFL project successfully deployed to Netlify"
+        echo "🌐 Website: https://kfl-karshakfoodlife.netlify.app"
+        echo "🔧 API: https://ogbar.in/api"
+        echo "⚙️ Admin: https://ogbar.in/admin"
+    
+    - name: Notify deployment failure
+      if: failure()
+      run: |
+        echo "❌ KFL project deployment failed"
+        echo "Check the logs above for details"
+        echo "Common issues:"
+        echo "- Netlify token not configured"
+        echo "- Site ID not configured"
+        echo "- Build failed"
+        echo "- Missing dependencies"
+
+  deploy-vercel:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout KFL repository
+      uses: actions/checkout@v4
+    
+    - name: Deploy to Vercel
+      uses: amondnet/vercel-action@v25
+      with:
+        vercel-token: ${{ secrets.VERCEL_TOKEN }}
+        vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+        vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+        working-directory: ./
+        vercel-args: '--prod'
+    
+    - name: Notify Vercel deployment success
+      if: success()
+      run: |
+        echo "✅ KFL project successfully deployed to Vercel"
+        echo "🌐 Website: https://kfl-karshakfoodlife.vercel.app"
