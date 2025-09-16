@@ -23,6 +23,10 @@
     {
       "src": "api/admin/index.py",
       "use": "@vercel/python"
+    },
+    {
+      "src": "api/admin/dashboard.py",
+      "use": "@vercel/python"
     }
   ],
   "routes": [
@@ -41,6 +45,26 @@
     {
       "src": "/api/admin",
       "dest": "/api/admin/index.py"
+    },
+    {
+      "src": "/api/admin/dashboard",
+      "dest": "/api/admin/dashboard.py"
+    },
+    {
+      "src": "/admin",
+      "dest": "/admin.html"
+    },
+    {
+      "src": "/admin.html",
+      "dest": "/admin.html"
+    },
+    {
+      "src": "/admin-panel",
+      "dest": "/admin-panel.html"
+    },
+    {
+      "src": "/admin-panel.html",
+      "dest": "/admin-panel.html"
     },
     {
       "src": "/assets/(.*)",
