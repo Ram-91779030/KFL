@@ -9,14 +9,30 @@
       }
     },
     {
-      "src": "api/main.py",
+      "src": "api/products.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "api/categories.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "api/health.py",
       "use": "@vercel/python"
     }
   ],
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "/api/main.py"
+      "src": "/api/products",
+      "dest": "/api/products.py"
+    },
+    {
+      "src": "/api/categories",
+      "dest": "/api/categories.py"
+    },
+    {
+      "src": "/api/health",
+      "dest": "/api/health.py"
     },
     {
       "src": "/assets/(.*)",
@@ -46,12 +62,6 @@
     }
   ],
   "env": {
-    "NODE_ENV": "production",
-    "PYTHONPATH": "/var/task"
-  },
-  "functions": {
-    "api/main.py": {
-      "runtime": "python3.9"
-    }
+    "NODE_ENV": "production"
   }
 }
