@@ -143,8 +143,12 @@ SIMPLE_JWT = {
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+    "https://kfl-karshakfoodlife.vercel.app",
+    "https://kfl-karshakfoodlife.netlify.app",
+    "https://ogbar.in",
 ]
 
+CORS_ALLOW_ALL_ORIGINS = True  # Allow all origins for deployment
 CORS_ALLOW_CREDENTIALS = True
 
 # Cart settings

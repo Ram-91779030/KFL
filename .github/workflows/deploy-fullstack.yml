@@ -1,0 +1,144 @@
+name: Deploy Full Stack App
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '18'
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    # Test Frontend
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+    
+    - name: Install frontend dependencies
+      run: npm install
+    
+    - name: Build frontend
+      run: npm run build
+      env:
+        VITE_API_URL: ""  # Use mock API for now
+    
+    - name: Test frontend build
+      run: |
+        if [ ! -d "build" ]; then
+          echo "Frontend build failed"
+          exit 1
+        fi
+        echo "Frontend build successful - $(du -sh build | cut -f1)"
+    
+    # Test Backend
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: Install backend dependencies
+      run: |
+        cd server
+        pip install -r requirements.txt
+    
+    - name: Test backend
+      run: |
+        cd server
+        python manage.py check
+        python manage.py migrate --check
+
+  deploy-frontend:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm install
+    
+    - name: Build frontend
+      run: npm run build
+      env:
+        VITE_API_URL: ""  # Use mock API
+    
+    - name: Deploy to Vercel
+      uses: amondnet/vercel-action@v25
+      with:
+        vercel-token: ${{ secrets.VERCEL_TOKEN }}
+        vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+        vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+        working-directory: ./
+        vercel-args: '--prod'
+    
+    - name: Deploy to Netlify
+      uses: nwtgck/actions-netlify@v3.0
+      with:
+        publish-dir: './build'
+        production-branch: main
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        deploy-message: "Deploy from GitHub Actions - ${{ github.sha }}"
+      env:
+        NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+        NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+    
+    - name: Deploy success
+      if: success()
+      run: |
+        echo "✅ Frontend deployed successfully!"
+        echo "🌐 Vercel: https://kfl-karshakfoodlife.vercel.app"
+        echo "🌐 Netlify: https://kfl-karshakfoodlife.netlify.app"
+        echo "📱 PWA features: Installable, offline support"
+        echo "🔧 Mock API: Working with sample data"
+
+  deploy-backend:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: Install backend dependencies
+      run: |
+        cd server
+        pip install -r requirements.txt
+    
+    - name: Deploy backend to Railway
+      uses: bervProject/railway-deploy@v1.0.7
+      with:
+        railway_token: ${{ secrets.RAILWAY_TOKEN }}
+        service: ${{ secrets.RAILWAY_SERVICE_ID }}
+        detach: true
+    
+    - name: Backend deployment success
+      if: success()
+      run: |
+        echo "✅ Backend deployed successfully!"
+        echo "🔧 API: https://kfl-backend.railway.app"
+        echo "📊 Admin: https://kfl-backend.railway.app/admin"
+        echo "💾 Database: SQLite (Railway managed)"
